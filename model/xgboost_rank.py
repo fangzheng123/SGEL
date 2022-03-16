@@ -464,10 +464,7 @@ class XgboostRank(object):
 
 if __name__ == "__main__":
     source_dir = "/data/fangzheng/bert_el/"
-    # model_path = source_dir + "model/xgboost/aida_train_local"
-    # model_path = source_dir + "model/xgboost/aida_train_global"
-    model_path = source_dir + "model/xgboost/wiki_clueweb_local_other"
-    # model_path = source_dir + "model/xgboost/wiki_clueweb_global"
+    model_path = source_dir + "model/xgboost/aida_train_local"
 
     data_util = data_util.DataUtil()
 

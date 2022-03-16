@@ -465,10 +465,8 @@ if __name__ == "__main__":
     # rank_format_path = source_dir + data_name + "/candidate/" + data_name + "_rank_format"
     # cut_rank_path = source_dir + data_name + "/candidate/" + data_name + "_cut_rank_format"
 
-    print(data_name)
-
+    # 多进程
     # el_fea.split_data(candidate_path, 10000)
-
     # for i in range(34):
     #     p = multiprocessing.Process(target=worker, args=(i, ""))
     #     p.start()

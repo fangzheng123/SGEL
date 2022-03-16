@@ -173,106 +173,106 @@ class ProcessBert(object):
 
         print(rank_bert_path.split("/")[-1], top_num, recall_count, all_count, recall_count/all_count)
 
-    # def combine_xgboost_bert(self, cut_candidate_path, bert_vec_path):
-    #     """
-    #     combine xgboost score and bert score, and add bert's rank postion to entity object
-    #     :param cut_candidate_path:
-    #     :param bert_vec_path:
-    #     :return:
-    #     """
-    #
-    #     group_score_dict = {}
-    #     group_id_list = []
-    #     with open(bert_vec_path, "r", encoding="utf-8") as bert_score_file:
-    #         for item in bert_score_file:
-    #             item = item.strip()
-    #
-    #             group_id = int(item.split("\t")[0])
-    #             score = float(item.split("\t")[-1])
-    #
-    #             if group_id not in set(group_id_list):
-    #                 group_id_list.append(group_id)
-    #
-    #             if group_id not in group_score_dict:
-    #                 group_score_dict[group_id] = [score]
-    #             else:
-    #                 group_score_dict[group_id].append(score)
-    #
-    #     # rank bert score
-    #     all_bert_list = []
-    #     for group_id in group_id_list:
-    #         score_list = group_id_list[group_id]
-    #
-    #         score_dict = {}
-    #         for index, score in enumerate(score_list):
-    #             score_dict[index] = score
-    #
-    #         position = 1
-    #         for index, val in sorted(score_dict.items(), key=lambda x: x[1], reverse=True):
-    #             tmp_dict = {}
-    #             tmp_dict["bert_rank_positon"] = position
-    #             tmp_dict["bert_score"] = val
-    #             score_list[index] = tmp_dict
-    #             position += 1
-    #
-    #         # score_list = [dict, dict, ...]
-    #         all_bert_list.extend(score_list)
-    #
-    #     # combine xgboost and bert score
-    #     cut_candidate_list = []
-    #     with open(cut_candidate_path, "r", encoding="utf-8") as cut_candidate_file:
-    #         for index, item in enumerate(cut_candidate_file):
-    #             item = item.strip()
-    #
-    #             group_str, label_str, fea_str, mention_str, entity_str = item.split("\t")
-    #
-    #             fea_dict = json.loads(fea_str)
-    #
-    #             bert_dict = all_bert_list[index]
-    #
-    #             fea_dict["bert_rank_position"] = bert_dict["bert_rank_position"]
-    #             fea_dict["bert_score"] = bert_dict["bert_score"]
-    #
-    #             fea_str = json.dumps(fea_dict)
-    #
-    #             cut_candidate_list.append("\t".join([group_str, label_str, fea_str, mention_str, entity_str]))
-    #
-    #     with open(cut_candidate_path, "w", encoding="utf-8") as cut_candidate_file:
-    #         for item in cut_candidate_list:
-    #             cut_candidate_file.write(item + "\n")
+    def combine_xgboost_bert(self, cut_candidate_path, bert_vec_path):
+        """
+        combine xgboost score and bert score, and add bert's rank postion to entity object
+        :param cut_candidate_path:
+        :param bert_vec_path:
+        :return:
+        """
+
+        group_score_dict = {}
+        group_id_list = []
+        with open(bert_vec_path, "r", encoding="utf-8") as bert_score_file:
+            for item in bert_score_file:
+                item = item.strip()
+
+                group_id = int(item.split("\t")[0])
+                score = float(item.split("\t")[-1])
+
+                if group_id not in set(group_id_list):
+                    group_id_list.append(group_id)
+
+                if group_id not in group_score_dict:
+                    group_score_dict[group_id] = [score]
+                else:
+                    group_score_dict[group_id].append(score)
+
+        # rank bert score
+        all_bert_list = []
+        for group_id in group_id_list:
+            score_list = group_id_list[group_id]
+
+            score_dict = {}
+            for index, score in enumerate(score_list):
+                score_dict[index] = score
+
+            position = 1
+            for index, val in sorted(score_dict.items(), key=lambda x: x[1], reverse=True):
+                tmp_dict = {}
+                tmp_dict["bert_rank_positon"] = position
+                tmp_dict["bert_score"] = val
+                score_list[index] = tmp_dict
+                position += 1
+
+            # score_list = [dict, dict, ...]
+            all_bert_list.extend(score_list)
+
+        # combine xgboost and bert score
+        cut_candidate_list = []
+        with open(cut_candidate_path, "r", encoding="utf-8") as cut_candidate_file:
+            for index, item in enumerate(cut_candidate_file):
+                item = item.strip()
+
+                group_str, label_str, fea_str, mention_str, entity_str = item.split("\t")
+
+                fea_dict = json.loads(fea_str)
+
+                bert_dict = all_bert_list[index]
+
+                fea_dict["bert_rank_position"] = bert_dict["bert_rank_position"]
+                fea_dict["bert_score"] = bert_dict["bert_score"]
+
+                fea_str = json.dumps(fea_dict)
+
+                cut_candidate_list.append("\t".join([group_str, label_str, fea_str, mention_str, entity_str]))
+
+        with open(cut_candidate_path, "w", encoding="utf-8") as cut_candidate_file:
+            for item in cut_candidate_list:
+                cut_candidate_file.write(item + "\n")
 
     def control_source_bert(self):
         data_name = "ace2004"
         cut_candidate_path = "/home1/fangzheng/data/bert_el_data/" + data_name + "/generate/" + data_name + "_cut_rank_format"
 
-        # cut_candidate_path = "/home1/fangzheng/data/bert_el_data/aida_train/generate/aida_train_cut_rank_format_small"
-        # bert_path = "/home1/fangzheng/data/bert_el_data/aida_train/bert/aida_train_cut_rank_format_small"
-        # mention_vec_path = "/home1/fangzheng/data/bert_el_data/aida_train/bert/aida_train_small_mention_sent_features"
-        # entity_vec_path = "/home1/fangzheng/data/bert_el_data/aida_train/bert/aida_train_small_entity_sent_features"
-        # bert_process.build_sent(cut_candidate_path, bert_path)
+        cut_candidate_path = "/home1/fangzheng/data/bert_el_data/aida_train/generate/aida_train_cut_rank_format_small"
+        bert_path = "/home1/fangzheng/data/bert_el_data/aida_train/bert/aida_train_cut_rank_format_small"
+        mention_vec_path = "/home1/fangzheng/data/bert_el_data/aida_train/bert/aida_train_small_mention_sent_features"
+        entity_vec_path = "/home1/fangzheng/data/bert_el_data/aida_train/bert/aida_train_small_entity_sent_features"
+        bert_process.build_sent(cut_candidate_path, bert_path)
 
-        # mention_vec_path = "/home1/fangzheng/data/bert_el_data/" + data_name + "/bert/" + "mention_sent_features"
-        # entity_vec_path = "/home1/fangzheng/data/bert_el_data/" + data_name + "/bert/" + "entity_sent_features"
-        # bert_process.map_sent_vector(cut_candidate_path, mention_vec_path, entity_vec_path)
+        mention_vec_path = "/home1/fangzheng/data/bert_el_data/" + data_name + "/bert/" + "mention_sent_features"
+        entity_vec_path = "/home1/fangzheng/data/bert_el_data/" + data_name + "/bert/" + "entity_sent_features"
+        bert_process.map_sent_vector(cut_candidate_path, mention_vec_path, entity_vec_path)
 
     def control_fine_tuning(self):
         data_name = "kore50"
         cut_rank_path = "/home1/fangzheng/data/bert_el_data/" + data_name + "/candidate/" + data_name + "_cut_rank_format"
         print(data_name)
 
-        # bert_fine_tuning_data_path = "/home1/fangzheng/data/bert_el_data/" + data_name + "/bert/" + data_name + "_bert_data"
-        # bert_process.fine_tuning_bert_data(cut_rank_path, bert_fine_tuning_data_path)
+        bert_fine_tuning_data_path = "/home1/fangzheng/data/bert_el_data/" + data_name + "/bert/" + data_name + "_bert_data"
+        bert_process.fine_tuning_bert_data(cut_rank_path, bert_fine_tuning_data_path)
 
         bert_fine_tuning_vec_path = "/home1/fangzheng/project/bert/predict_bs2/" + data_name + "_merged"
         cut_rank_bert_vec_path = "/home1/fangzheng/data/bert_el_data/" + data_name + "/bert/" + data_name + "_cut_rank_bert_vec"
-        # bert_process.map_fine_tuning_vec2data(cut_rank_path, bert_fine_tuning_vec_path, cut_rank_bert_vec_path)
+        bert_process.map_fine_tuning_vec2data(cut_rank_path, bert_fine_tuning_vec_path, cut_rank_bert_vec_path)
 
 if __name__ == "__main__":
     bert_process = ProcessBert()
 
     source_dir = "/data/fangzheng/bert_el/"
     bert_source_dir = "/data/fangzheng/bert/"
-    name_list = ["wiki_clueweb"]
+    name_list = ["aida_testB"]
     # name_list = ["msnbc", "ace2004", "aquaint", "rss500", "reuters128", "kore50", "aida_testA", "aida_testB"]
     for data_name in name_list:
         print(data_name)
@@ -283,4 +283,4 @@ if __name__ == "__main__":
         bert_rank_path = source_dir + data_name + "/bert/" + data_name + "_cut_rank_format_bert"
 
         bert_process.fine_tuning_bert_data(cut_data_path, bert_data_path)
-        # bert_process.map_fine_tuning_vec2data(cut_data_path, bert_result_path, bert_rank_path)
+        bert_process.map_fine_tuning_vec2data(cut_data_path, bert_result_path, bert_rank_path)
