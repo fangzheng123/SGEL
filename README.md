@@ -33,7 +33,7 @@ Now you can choose to use huggingface to train the BERT local model.
 python model/local_ranker.py
 ```
 
-5.Train global GAT model
+5.Train the global GAT model
 ```
 python model/selector.py
 ```
